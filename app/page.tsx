@@ -8,7 +8,7 @@ export default async function RootPage() {
 
   // If user is authenticated, redirect to dashboard
   if (userId) {
-    redirect("/candidates")
+    redirect("/dashboard")
   }
 
   // Otherwise, redirect to sign-in

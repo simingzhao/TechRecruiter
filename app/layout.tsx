@@ -23,8 +23,15 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Tech Recruiter CRM",
-  description: "A CRM system designed specifically for tech recruiters"
+  title: {
+    default: "Tech Recruiter CRM",
+    template: "%s | Tech Recruiter CRM"
+  },
+  description: "A CRM system designed specifically for tech recruiters",
+  keywords: ["recruiter", "crm", "tech", "recruitment"],
+  authors: [{ name: "Tech Recruiter CRM Team" }],
+  creator: "Tech Recruiter CRM",
+  publisher: "Tech Recruiter CRM"
 }
 
 export default async function RootLayout({

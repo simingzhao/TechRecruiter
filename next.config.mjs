@@ -9,22 +9,12 @@ const nextConfig = {
   images: {
     remotePatterns: [{ hostname: "localhost" }]
   },
-  experimental: {
-    serverActions: {
-      allowedOrigins: ["localhost:3000"]
-    }
-  },
   typescript: {
     ignoreBuildErrors: true
   },
   eslint: {
     ignoreDuringBuilds: true
-  },
-  poweredByHeader: false,
-  reactStrictMode: true,
-  output: 'standalone',
-  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
-  swcMinify: true
+  }
 }
 
 export default nextConfig
