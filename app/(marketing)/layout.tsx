@@ -8,6 +8,11 @@ This server layout provides a shared header and basic structure for (marketing) 
 
 import Header from "@/components/header"
 
+export const metadata = {
+  title: 'Marketing',
+  description: 'Marketing pages for the application'
+}
+
 export default async function MarketingLayout({
   children
 }: {

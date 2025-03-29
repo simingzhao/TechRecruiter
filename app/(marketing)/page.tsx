@@ -9,6 +9,11 @@ This server page is the marketing homepage.
 import { FeaturesSection } from "@/components/landing/features"
 import { HeroSection } from "@/components/landing/hero"
 
+export const metadata = {
+  title: 'Home | Tech Recruiter CRM',
+  description: 'A CRM system designed specifically for tech recruiters'
+}
+
 export default async function HomePage() {
   return (
     <div className="pb-20">
