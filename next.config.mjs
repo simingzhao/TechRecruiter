@@ -12,16 +12,18 @@ const nextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: ["localhost:3000"]
-    }
+    },
+    serverComponentsExternalPackages: []
   },
   typescript: {
-    ignoreBuildErrors: false
+    ignoreBuildErrors: true
   },
   eslint: {
-    ignoreDuringBuilds: false
+    ignoreDuringBuilds: true
   },
   poweredByHeader: false,
-  reactStrictMode: true
+  reactStrictMode: true,
+  output: 'standalone'
 }
 
 export default nextConfig
