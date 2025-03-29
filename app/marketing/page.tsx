@@ -8,8 +8,10 @@ This server page is the marketing homepage.
 
 import { FeaturesSection } from "@/components/landing/features"
 import { HeroSection } from "@/components/landing/hero"
+import type { Metadata } from "next"
 
-export const metadata = {
+// Metadata needs to be in a separate server component or layout
+export const metadata: Metadata = {
   title: 'Home | Tech Recruiter CRM',
   description: 'A CRM system designed specifically for tech recruiters'
 }

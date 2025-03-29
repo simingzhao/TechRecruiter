@@ -12,8 +12,7 @@ const nextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: ["localhost:3000"]
-    },
-    serverComponentsExternalPackages: []
+    }
   },
   typescript: {
     ignoreBuildErrors: true
@@ -23,7 +22,9 @@ const nextConfig = {
   },
   poweredByHeader: false,
   reactStrictMode: true,
-  output: 'standalone'
+  output: 'standalone',
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
+  swcMinify: true
 }
 
 export default nextConfig

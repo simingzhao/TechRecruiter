@@ -7,8 +7,10 @@ This server layout provides a shared header and basic structure for (marketing) 
 "use client"
 
 import Header from "@/components/header"
+import type { Metadata } from "next"
 
-export const metadata = {
+// Metadata needs to be in a separate server component or layout
+export const metadata: Metadata = {
   title: 'Marketing',
   description: 'Marketing pages for the application'
 }
