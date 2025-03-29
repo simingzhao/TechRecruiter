@@ -1,0 +1,293 @@
+---
+description: PDF Parsing Rules
+globs: 
+alwaysApply: false
+---
+Use pdf2json as your pdf parsing package, it is a Node.js module that converts binary PDF files to structured JSON and extracts text content. Built on Mozilla's pdf.js, it's been adapted to run in Node.js rather than a browser environment, focusing specifically on text extraction and interactive form element parsing. The following are code examples:
+#### Basic PDF to JSON Conversion
+
+```javascript
+import fs from "fs";
+import { PDFParser } from "pdf2json";
+
+const pdfParser = new PDFParser();
+
+pdfParser.on("pdfParser_dataError", (errData) => {
+
+console.error(errData.parserError);
+
+});
+
+
+pdfParser.on("pdfParser_dataReady", (pdfData) => {
+
+fs.writeFile(
+
+"./output.json",
+
+JSON.stringify(pdfData),
+
+() => console.log("Done.")
+
+);
+
+});
+
+pdfParser.loadPDF("./input.pdf");
+
+```
+
+#### Extracting Text Content Only
+
+```javascript
+
+import fs from "fs";
+
+import { PDFParser } from "pdf2json";
+
+  
+
+const pdfParser = new PDFParser();
+
+  
+
+pdfParser.on("pdfParser_dataError", (errData) => {
+
+console.error(errData.parserError);
+
+});
+
+  
+
+pdfParser.on("pdfParser_dataReady", () => {
+
+fs.writeFile(
+
+"./output.txt",
+
+pdfParser.getRawTextContent(),
+
+() => console.log("Text extraction complete")
+
+);
+
+});
+
+  
+
+pdfParser.loadPDF("./input.pdf");
+
+```
+
+#### Extracting Form Fields Only
+
+```javascript
+
+import fs from "fs";
+
+import { PDFParser } from "pdf2json";
+
+  
+
+const pdfParser = new PDFParser();
+
+  
+
+pdfParser.on("pdfParser_dataError", (errData) => {
+
+console.error(errData.parserError);
+
+});
+
+  
+
+pdfParser.on("pdfParser_dataReady", () => {
+
+fs.writeFile(
+
+"./fields.json",
+
+JSON.stringify(pdfParser.getAllFieldsTypes()),
+
+() => console.log("Form fields extraction complete")
+
+);
+
+});
+
+  
+
+pdfParser.loadPDF("./input.pdf");
+
+```
+#### Pattern Library
+
+##### Basic Parsing Pattern
+
+```javascript
+
+import { PDFParser } from "pdf2json";
+
+  
+
+function parsePdf(filePath) {
+
+return new Promise((resolve, reject) => {
+
+const pdfParser = new PDFParser();
+
+pdfParser.on("pdfParser_dataError", (error) => reject(error));
+
+pdfParser.on("pdfParser_dataReady", (data) => resolve(data));
+
+pdfParser.loadPDF(filePath);
+
+});
+
+}
+
+  
+
+// Usage
+
+parsePdf("./document.pdf")
+
+.then(data => {
+
+// Process data
+
+})
+
+.catch(error => {
+
+// Handle error
+
+});
+
+```
+
+##### Multiple Output Formats Pattern
+
+```javascript
+
+import fs from "fs";
+
+import { PDFParser } from "pdf2json";
+
+  
+
+function extractAllFormats(inputPath, outputBasePath) {
+
+return new Promise((resolve, reject) => {
+
+const pdfParser = new PDFParser();
+
+pdfParser.on("pdfParser_dataError", (error) => reject(error));
+
+pdfParser.on("pdfParser_dataReady", (data) => {
+
+// Primary JSON output
+
+const primaryOutput = fs.writeFile(
+
+`${outputBasePath}.json`,
+
+JSON.stringify(data)
+
+);
+
+// Text content output
+
+const textOutput = fs.writeFile(
+
+`${outputBasePath}.txt`,
+
+pdfParser.getRawTextContent()
+
+);
+
+// Form fields output
+
+const fieldsOutput = fs.writeFile(
+
+`${outputBasePath}.fields.json`,
+
+JSON.stringify(pdfParser.getAllFieldsTypes())
+
+);
+
+Promise.all([primaryOutput, textOutput, fieldsOutput])
+
+.then(() => resolve(data))
+
+.catch(err => reject(err));
+
+});
+
+pdfParser.loadPDF(inputPath);
+
+});
+
+}
+
+```
+
+##### Dictionary Access Helper
+
+```javascript
+
+import { PDFParser } from "pdf2json";
+
+  
+
+// Get reference to dictionaries
+
+const colorDict = PDFParser.colorDict;
+
+const fontFaceDict = PDFParser.fontFaceDict;
+
+const fontStyleDict = PDFParser.fontStyleDict;
+
+  
+
+// Helper to get color from index or hex
+
+function getColor(colorIndex) {
+
+if (colorIndex === -1 || colorIndex >= colorDict.length) {
+
+return null; // Will use 'oc' field for original color
+
+}
+
+return colorDict[colorIndex];
+
+}
+
+  
+
+// Helper to get font face
+
+function getFontFace(faceIndex) {
+
+if (faceIndex >= fontFaceDict.length) return fontFaceDict[0];
+
+return fontFaceDict[faceIndex];
+
+}
+
+  
+
+// Helper to get font style
+
+function getFontStyle(styleIndex) {
+
+if (styleIndex === -1) return null; // Will use 'TS' field
+
+if (styleIndex >= fontStyleDict.length) return fontStyleDict[0];
+
+return fontStyleDict[styleIndex];
+
+}
+
+```

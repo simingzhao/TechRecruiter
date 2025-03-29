@@ -1,0 +1,353 @@
+---
+description: OpenAI API Request
+globs: 
+alwaysApply: false
+---
+#### Model Configuration
+
+- Always use the latest model: `gpt-4o-2024-11-20`
+
+- Utilize structured outputs when handling model responses in workflows to ensure consistent JSON schema adherence
+#### Setup and Initialization
+
+```javascript
+
+// Initialize with API key from environment variable
+
+import OpenAI from "openai";
+
+  
+
+const client = new OpenAI({
+
+apiKey: process.env.OPENAI_API_KEY, // automatically reads from environment
+
+});
+
+```
+
+#### Basic Usage Patterns
+
+##### Simple Text Generation
+
+```javascript
+
+// Generate plain text responses
+
+async function generateText() {
+
+const response = await client.responses.create({
+
+model: "gpt-4o-2024-11-20",
+
+input: "Explain quantum computing in simple terms."
+
+});
+
+// Access text using convenience property
+
+console.log(response.output_text);
+
+}
+
+```
+
+##### Using Instructions Parameter
+
+```javascript
+
+// Apply custom instructions to guide model behavior
+
+async function generateWithInstructions() {
+
+const response = await client.responses.create({
+
+model: "gpt-4o-2024-11-20",
+
+instructions: "Respond like a pirate captain.",
+
+input: "What's the weather like today?"
+
+});
+
+console.log(response.output_text);
+
+}
+
+```
+
+#### Advanced Implementation Patterns
+
+##### Prompt Template Manager
+
+```javascript
+
+class PromptTemplateManager {
+
+constructor() {
+
+this.templates = {};
+
+}
+
+  
+
+registerTemplate(name, template) {
+
+this.templates[name] = template;
+
+}
+
+  
+
+fillTemplate(templateName, variables) {
+
+const template = this.templates[templateName];
+
+if (!template) {
+
+throw new Error(`Template "${templateName}" not found`);
+
+}
+
+// Replace {{variable}} placeholders with values
+
+return template.replace(/\{\{(\w+)\}\}/g, (match, variable) => {
+
+return variables[variable] !== undefined ? variables[variable] : match;
+
+});
+
+}
+
+  
+
+async generateFromTemplate(templateName, variables, model = "gpt-4o-2024-11-20") {
+
+const prompt = this.fillTemplate(templateName, variables);
+
+const client = new OpenAI();
+
+const response = await client.responses.create({
+
+model: model,
+
+input: prompt
+
+});
+
+return response.output_text;
+
+}
+
+}
+
+```
+
+#### Structured Output Implementation
+
+##### Basic Setup  
+
+```javascript
+
+import OpenAI from "openai";
+
+  
+
+const openai = new OpenAI();
+
+  
+
+async function extractEventData(text) {
+
+const response = await openai.responses.create({
+
+model: "gpt-4o-2024-11-20",
+
+input: [
+
+{
+
+role: "system",
+
+content: "Extract structured event information from the text."
+
+},
+
+{
+
+role: "user",
+
+content: text
+
+}
+
+],
+
+text: {
+
+format: {
+
+type: "json_schema",
+
+name: "calendar_event",
+
+schema: {
+
+type: "object",
+
+properties: {
+
+name: { type: "string" },
+
+date: { type: "string" },
+
+participants: {
+
+type: "array",
+
+items: { type: "string" }
+
+}
+
+},
+
+required: ["name", "date", "participants"],
+
+additionalProperties: false
+
+},
+
+strict: true
+
+}
+
+}
+
+});
+
+return JSON.parse(response.output_text);
+
+}
+
+```
+
+##### Robust Error Handling
+
+```javascript
+
+async function extractDataWithErrorHandling(text) {
+
+try {
+
+const response = await openai.responses.create({
+
+model: "gpt-4o-2024-11-20", // Updated from 2024-08-06
+
+input: [
+
+{
+
+role: "system",
+
+content: "Extract structured data from the text."
+
+},
+
+{
+
+role: "user",
+
+content: text
+
+}
+
+],
+
+text: {
+
+format: {
+
+type: "json_schema",
+
+name: "extracted_data",
+
+schema: {
+
+type: "object",
+
+properties: {
+
+// Schema properties here
+
+},
+
+required: ["field1", "field2"],
+
+additionalProperties: false
+
+},
+
+strict: true
+
+}
+
+}
+
+});
+
+  
+
+// Check for refusals
+
+if (response.output[0].content.some(content => content.type === "refusal")) {
+
+const refusalContent = response.output[0].content.find(content =>
+
+content.type === "refusal"
+
+).refusal;
+
+console.log("Model refused to generate response:", refusalContent);
+
+return { error: "REFUSAL", message: refusalContent };
+
+}
+
+  
+
+// Check for incomplete responses
+
+if (response.status === "incomplete") {
+
+const reason = response.incomplete_details.reason;
+
+if (reason === "max_output_tokens") {
+
+return { error: "TRUNCATED", message: "Response exceeded maximum length" };
+
+} else if (reason === "content_filter") {
+
+return { error: "FILTERED", message: "Content was filtered" };
+
+}
+
+return { error: "INCOMPLETE", message: `Response incomplete: ${reason}` };
+
+}
+
+  
+
+// Parse and return successful response
+
+return JSON.parse(response.output_text);
+
+} catch (error) {
+
+console.error("API error:", error);
+
+return { error: "API_ERROR", message: error.message };
+
+}
+
+}
